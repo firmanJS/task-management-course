@@ -27,6 +27,7 @@
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<a href="https://codeclimate.com/github/firmanJS/task-management-course/test_coverage"><img src="https://api.codeclimate.com/v1/badges/4911d8433ed47712bc97/test_coverage" /></a>
 
 ## Installation
 
