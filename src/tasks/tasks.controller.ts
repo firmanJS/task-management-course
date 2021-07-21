@@ -1,49 +1,41 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
-import { TasksService } from './tasks.service';
-import { Task, TaskStatus } from './tasks.model';
+import { Controller, Get, Post, Body, Param, Delete, Patch, Query, UsePipes, ValidationPipe, ParseIntPipe } from '@nestjs/common';
 import { CreateTaskDto } from 'src/dto/tasks/create.tasks.dto';
 import { GetTasksFilterDto } from 'src/dto/tasks/filter.tasks.dto';
+import { TaskStatusValidationPipe } from 'src/pipe/tasks/task.validation.pipe';
+import { TaskStatus } from './tasks-status.enum';
+import { Task } from './tasks.entity';
+import { TasksService } from './tasks.service';
 
-@Controller('tasks')
+@Controller('api/v1/tasks')
 export class TasksController {
-    constructor(private tasksServices: TasksService) { }
+  constructor(private tasksService: TasksService) {}
 
-    @Get()
-    getAll(@Query(ValidationPipe) filterDto: GetTasksFilterDto): Task[] {
-        if (Object.keys(filterDto).length) {
-            return this.tasksServices.getWithFilters(filterDto);
-        } else {
-            return this.tasksServices.getAll();
-        }
-    }
+  @Get()
+  getTasks(@Query(ValidationPipe) filterDto: GetTasksFilterDto): Promise<Task[]> {
+    return this.tasksService.getTasks(filterDto);
+  }
 
-    @Get('/:id')
-    getByParam(@Param('id') id: string): Task {
-        return this.tasksServices.getByParam(id)
-    }
+  @Get('/:id')
+  getTaskById(@Param('id', ParseIntPipe) id: number): Promise<Task> {
+    return this.tasksService.getTaskById(id);
+  }
 
-    @Post()
-    // create(
-    //     @Body('title') title:string,
-    //     @Body('description') description:string,
-    // ): Task {
-    //     return this.tasksServices.create(title, description)
-    // }  
-    @UsePipes(ValidationPipe)
-    create(@Body() createTaskDto: CreateTaskDto): Task {
-        return this.tasksServices.create(createTaskDto)
-    }
+  @Post()
+  @UsePipes(ValidationPipe)
+  createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.tasksService.createTask(createTaskDto);
+  }
 
-    @Put('/:id')
-    update(
-        @Param('id') id: string,
-        @Body('status') status: TaskStatus,
-    ): Task {
-        return this.tasksServices.update(id, status)
-    }
+  @Delete('/:id')
+  deleteTask(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.tasksService.deleteTask(id);
+  }
 
-    @Delete('/:id')
-    delete(@Param('id') id: string): void {
-        return this.tasksServices.delete(id)
-    }
+  @Patch('/:id/status')
+  updateTaskStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status', TaskStatusValidationPipe) status: TaskStatus,
+  ): Promise<Task> {
+    return this.tasksService.updateTaskStatus(id, status);
+  }
 }
