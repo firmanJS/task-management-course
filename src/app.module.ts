@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TasksModule } from './tasks/tasks.module';
-
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeOrmConfig } from './config/typeorm.config';
 @Module({
-  imports: [TasksModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    TasksModule,
+    TypeOrmModule.forRoot(typeOrmConfig),
+    ConfigModule.forRoot({envFilePath: 'local.env'})
+    // ConfigModule.forRoot({  ignoreEnvFile: true, isGlobal: true, envFilePath: '.env' }), 
+  ],
 })
 export class AppModule {}
